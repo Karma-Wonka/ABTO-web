@@ -1,0 +1,19 @@
+{
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  "name": "Association of Bhutanese Tour Operators",
+  "alternateName": "ABTO",
+  "foundingDate": "2000",
+  "url": "https://abto.org.bt/",
+  "description": "The mutual and official voice of all Bhutanese tour operators, representing and protecting the collective interests of Bhutan's tourism industry.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Drimey Lam",
+    "postOfficeBoxNumber": "938",
+    "addressLocality": "Thimphu",
+    "addressCountry": "BT"
+  },
+  "telephone": "+975-2-322862",
+  "nonprofitStatus": "NonprofitANBI",
+  "areaServed": { "@type": "Country", "name": "Bhutan" }
+}

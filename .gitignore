@@ -1,0 +1,6 @@
+﻿node_modules
+.next
+dev-log.txt
+public_import
+drive_import
+.env*
