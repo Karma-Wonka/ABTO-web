@@ -1,0 +1,72 @@
+
+> abto-redesign@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.23
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.86.161:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1756ms
+ ○ Compiling / ...
+ ✓ Compiled / in 577ms (640 modules)
+(node:36216) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '2793631356'
+}
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '2793631356'
+}
+ GET / 500 in 1684ms
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '2793631356'
+}
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '2793631356'
+}
+ GET / 500 in 940ms
