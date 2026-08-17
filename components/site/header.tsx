@@ -8,6 +8,7 @@ import { BRAND_MARK } from "@/data/brand-mark";
 import type { LiveData } from "@/lib/live-data";
 
 type SearchHit = { t: string; ty: string; h: string };
+type Session = { email: string; name: string | null } | null;
 
 function buildSearchIndex(liveData: LiveData): SearchHit[] {
   return [
@@ -35,7 +36,7 @@ type NavLink = { href: string; label: string; small?: string };
 type NavGroup = { heading: string; links: NavLink[] };
 type NavItem = { label: string; groups: NavGroup[] };
 
-const NAV: NavItem[] = [
+const NAV_BASE: NavItem[] = [
   {
     label: "The Association",
     groups: [
@@ -132,10 +133,40 @@ export default function Header({ liveData }: { liveData: LiveData }) {
   const [openDrawerGroup, setOpenDrawerGroup] = useState<number | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [loggingOut, setLoggingOut] = useState(false);
+  // Session lives client-side (fetched below) rather than being read via
+  // cookies() in the root layout — that would force every page on the
+  // site to render dynamically just to gate one nav link. undefined
+  // means "not checked yet"; treated the same as logged-out so the
+  // members-only link never flashes into view before we know.
+  const [session, setSession] = useState<Session | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => { if (!cancelled) setSession(data.session ?? null); })
+      .catch(() => { if (!cancelled) setSession(null); });
+    return () => { cancelled = true; };
+  }, [pathname]);
+
   const searchIndex = useMemo(() => buildSearchIndex(liveData), [liveData]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const lastPathname = useRef(pathname);
+  const NAV = NAV_BASE;
+
+  const logout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setSession(null);
+      router.push("/");
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -231,9 +262,24 @@ export default function Header({ liveData }: { liveData: LiveData }) {
             <button className="icon-btn" aria-label="Search the site" onClick={() => setSearchOpen(true)}>
               <svg width="18" height="18" aria-hidden="true"><use href="#i-search" /></svg>
             </button>
-            <Link href="/membership#apply" className="btn btn-sm btn-ghost on-dark" style={{ marginLeft: ".3rem" }}>
-              <span>Member Login</span>
-            </Link>
+            {session ? (
+              <>
+                <Link href="/profile" className="btn btn-sm btn-ghost on-dark" style={{ marginLeft: ".3rem" }}>
+                  <span>{session.name || session.email}</span>
+                </Link>
+                <button
+                  className="btn btn-sm btn-ghost on-dark"
+                  onClick={logout}
+                  disabled={loggingOut}
+                >
+                  <span>{loggingOut ? "Signing out…" : "Sign Out"}</span>
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="btn btn-sm btn-ghost on-dark" style={{ marginLeft: ".3rem" }}>
+                <span>Member Login</span>
+              </Link>
+            )}
             <button
               className="burger"
               aria-label="Open menu"

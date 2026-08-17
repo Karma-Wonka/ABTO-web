@@ -11,6 +11,60 @@ function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
+type UploadState = { status: "idle" | "uploading" | "done" | "error"; key?: string; name?: string; message?: string };
+const emptyUpload: UploadState = { status: "idle" };
+
+function FileDropzone({
+  label,
+  accept,
+  state,
+  onFile
+}: {
+  label: string;
+  accept: string;
+  state: UploadState;
+  onFile: (file: File) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <div
+      className={`dropzone ${state.status === "done" ? "on" : ""}`}
+      tabIndex={0}
+      role="button"
+      onClick={() => inputRef.current?.click()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); }
+      }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        const f = e.dataTransfer.files?.[0];
+        if (f) onFile(f);
+      }}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        hidden
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onFile(f);
+          e.target.value = "";
+        }}
+      />
+      <div style={{ color: "var(--stone)" }}>
+        <svg width="20" height="20" style={{ margin: "0 auto .5rem" }} aria-hidden="true"><use href="#i-dl" /></svg>
+        {state.status === "uploading" ? "Uploading…" : label}
+      </div>
+      <div className="fname" style={{ color: state.status === "error" ? "var(--kemar)" : undefined }}>
+        {state.status === "done" && `Attached: ${state.name}`}
+        {state.status === "error" && (state.message || "Upload failed. Try again.")}
+      </div>
+    </div>
+  );
+}
+
 function ConfirmationModal({ company, reference }: { company: string; reference: string }) {
   const close = useCloseModal();
   return (
@@ -30,12 +84,16 @@ function ConfirmationModal({ company, reference }: { company: string; reference:
 
 export default function ApplicationWizard() {
   const [step, setStep] = useState(1);
+  const [maxStep, setMaxStep] = useState(1);
   const [specs, setSpecs] = useState<string[]>([]);
   const [langs, setLangs] = useState<string[]>([]);
-  const [licenceFile, setLicenceFile] = useState(false);
-  const [feeFile, setFeeFile] = useState(false);
+  const [licenceFile, setLicenceFile] = useState<UploadState>(emptyUpload);
+  const [feeFile, setFeeFile] = useState<UploadState>(emptyUpload);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [review, setReview] = useState<Record<string, string>>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const openModal = useModal();
   const toast = useToast();
@@ -58,6 +116,7 @@ export default function ApplicationWizard() {
       });
     }
     setStep(n);
+    setMaxStep((m) => Math.max(m, n));
     setTimeout(() => {
       document.getElementById("stepper")?.scrollIntoView({ block: "start", behavior: "smooth" });
     }, 0);
@@ -69,15 +128,18 @@ export default function ApplicationWizard() {
     if (!pane) return true;
     let ok = true;
     const nextErrors: Record<string, boolean> = {};
+    const passwordValue = pane.querySelector<HTMLInputElement>('input[name="password"]')?.value ?? "";
     pane.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("[required]").forEach((f) => {
       let bad = !String(f.value).trim();
       if (f instanceof HTMLInputElement && f.type === "email" && f.value.trim()) bad = !isValidEmail(f.value);
+      if (f instanceof HTMLInputElement && f.name === "password" && f.value) bad = f.value.length < 8;
+      if (f instanceof HTMLInputElement && f.name === "confirmPassword" && f.value) bad = f.value !== passwordValue;
       if (bad) ok = false;
       nextErrors[f.name] = bad;
     });
     if (n === 3) {
-      if (!licenceFile) { ok = false; nextErrors.licenceFile = true; }
-      if (!feeFile) { ok = false; nextErrors.feeFile = true; }
+      if (licenceFile.status !== "done") { ok = false; nextErrors.licenceFile = true; }
+      if (feeFile.status !== "done") { ok = false; nextErrors.feeFile = true; }
     }
     setErrors((prev) => ({ ...prev, ...nextErrors }));
     if (!ok) toast("Please complete the highlighted fields before continuing.");
@@ -88,20 +150,94 @@ export default function ApplicationWizard() {
     if (validatePane(to - 1)) goto(to);
   };
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const uploadFile = async (file: File, setState: (s: UploadState) => void) => {
+    setState({ status: "uploading" });
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body });
+      const result = await res.json().catch(() => ({ success: false, message: "" }));
+      if (!res.ok || !result.success) {
+        setState({ status: "error", message: result.message || "Upload failed. Try again." });
+        return;
+      }
+      setState({ status: "done", key: result.key, name: file.name });
+    } catch {
+      setState({ status: "error", message: "Upload failed. Check your connection." });
+    }
+  };
+
+  // The header stepper lets people jump straight to a pane by clicking its
+  // number. Steps already reached can be revisited freely, but jumping
+  // ahead still has to pass validation for every pane in between —
+  // otherwise it was a back door around required fields (the form itself
+  // has noValidate, so nothing else was enforcing this).
+  const headerNav = (n: number) => {
+    if (n <= maxStep) { goto(n); return; }
+    for (let i = step; i < n; i++) {
+      if (!validatePane(i)) return;
+    }
+    goto(n);
+  };
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const data = new FormData(form);
     const company = String(data.get("company") || "Your company");
-    const reference = Date.now().toString().slice(-6);
-    openModal(<ConfirmationModal company={company} reference={reference} />);
-    e.currentTarget.reset();
-    setSpecs([]);
-    setLangs([]);
-    setLicenceFile(false);
-    setFeeFile(false);
-    setErrors({});
-    setReview({});
-    goto(1);
+    const password = String(data.get("password") || "");
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/membership", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "membership",
+          company,
+          name: String(data.get("person") || ""),
+          email: String(data.get("email") || ""),
+          phone: String(data.get("mobile") || ""),
+          message: String(data.get("desc") || ""),
+          password,
+          payload: {
+            licence: String(data.get("licence") || ""),
+            year: String(data.get("year") || ""),
+            region: String(data.get("region") || ""),
+            website: String(data.get("web") || ""),
+            position: String(data.get("position") || ""),
+            address: String(data.get("address") || ""),
+            specialties: specs,
+            languages: langs,
+            licenceFileKey: licenceFile.key,
+            licenceFileName: licenceFile.name,
+            feeFileKey: feeFile.key,
+            feeFileName: feeFile.name
+          }
+        })
+      });
+      const result = await res.json().catch(() => ({ success: false, message: "" }));
+      if (!res.ok || !result.success) {
+        toast(result.message || "Unable to submit your application. Please try again.");
+        return;
+      }
+
+      const reference = Date.now().toString().slice(-6);
+      openModal(<ConfirmationModal company={company} reference={reference} />);
+      form.reset();
+      setSpecs([]);
+      setLangs([]);
+      setLicenceFile(emptyUpload);
+      setFeeFile(emptyUpload);
+      setErrors({});
+      setReview({});
+      setMaxStep(1);
+      goto(1);
+    } catch {
+      toast("Unable to reach the server. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const row = (label: string, value?: string) =>
@@ -113,7 +249,7 @@ export default function ApplicationWizard() {
         {STEPS.map((label, i) => {
           const n = i + 1;
           return (
-            <button key={label} className={`s ${step === n ? "on" : ""} ${step > n ? "done" : ""}`} onClick={() => goto(n)} type="button">
+            <button key={label} className={`s ${step === n ? "on" : ""} ${step > n ? "done" : ""}`} onClick={() => headerNav(n)} type="button">
               <span className="sn">{n}</span><span className="st">{label}</span>
             </button>
           );
@@ -205,6 +341,64 @@ export default function ApplicationWizard() {
               <div className="errmsg">Enter a contact number.</div>
             </div>
           </div>
+          <div className="frow">
+            <div className={`fgroup ${errors.password ? "err" : ""}`}>
+              <label>Password <span className="req">*</span></label>
+              <div style={{ position: "relative" }}>
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  placeholder="At least 8 characters"
+                  style={{ paddingRight: "3.6rem" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  style={{
+                    position: "absolute", right: ".9rem", top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer",
+                    fontFamily: "var(--f-util)", fontSize: ".64rem", letterSpacing: ".1em",
+                    textTransform: "uppercase", color: "var(--stone)"
+                  }}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              <div className="errmsg">Enter a password with at least 8 characters.</div>
+            </div>
+            <div className={`fgroup ${errors.confirmPassword ? "err" : ""}`}>
+              <label>Confirm password <span className="req">*</span></label>
+              <div style={{ position: "relative" }}>
+                <input
+                  name="confirmPassword"
+                  type={showConfirm ? "text" : "password"}
+                  required
+                  autoComplete="new-password"
+                  placeholder="Re-enter your password"
+                  style={{ paddingRight: "3.6rem" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm((v) => !v)}
+                  style={{
+                    position: "absolute", right: ".9rem", top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer",
+                    fontFamily: "var(--f-util)", fontSize: ".64rem", letterSpacing: ".1em",
+                    textTransform: "uppercase", color: "var(--stone)"
+                  }}
+                >
+                  {showConfirm ? "Hide" : "Show"}
+                </button>
+              </div>
+              <div className="errmsg">Passwords do not match.</div>
+            </div>
+          </div>
+          <div className="hint" style={{ marginTop: "-.6rem", marginBottom: "1.2rem" }}>
+            This becomes the login for your ABTO member account once your application is approved.
+          </div>
           <div className="fgroup"><label>Office address</label><textarea name="address" placeholder="Building, street, town" /></div>
           <div className="fgroup">
             <label>Short description for your directory listing</label>
@@ -220,24 +414,22 @@ export default function ApplicationWizard() {
         <div className="pane" data-pane="3" style={{ display: step === 3 ? "block" : "none" }}>
           <div className={`fgroup ${errors.licenceFile ? "err" : ""}`}>
             <label>Scanned tour operation licence <span className="req">*</span></label>
-            <div className={`dropzone ${licenceFile ? "on" : ""}`} tabIndex={0} role="button" onClick={() => setLicenceFile(true)}>
-              <div style={{ color: "var(--stone)" }}>
-                <svg width="20" height="20" style={{ margin: "0 auto .5rem" }} aria-hidden="true"><use href="#i-dl" /></svg>
-                Click to attach a PDF, JPG or PNG
-              </div>
-              <div className="fname">{licenceFile ? "Attached: licence-scan.pdf" : ""}</div>
-            </div>
+            <FileDropzone
+              label="Click to attach, or drag a PDF, JPG or PNG"
+              accept=".pdf,.jpg,.jpeg,.png,.webp"
+              state={licenceFile}
+              onFile={(f) => uploadFile(f, setLicenceFile)}
+            />
             <div className="errmsg">Attach a copy of your licence.</div>
           </div>
           <div className={`fgroup ${errors.feeFile ? "err" : ""}`}>
             <label>Proof of Nu. 3,000 registration fee deposit <span className="req">*</span></label>
-            <div className={`dropzone ${feeFile ? "on" : ""}`} tabIndex={0} role="button" onClick={() => setFeeFile(true)}>
-              <div style={{ color: "var(--stone)" }}>
-                <svg width="20" height="20" style={{ margin: "0 auto .5rem" }} aria-hidden="true"><use href="#i-dl" /></svg>
-                Click to attach the deposit slip
-              </div>
-              <div className="fname">{feeFile ? "Attached: deposit-slip.jpg" : ""}</div>
-            </div>
+            <FileDropzone
+              label="Click to attach, or drag the deposit slip"
+              accept=".pdf,.jpg,.jpeg,.png,.webp"
+              state={feeFile}
+              onFile={(f) => uploadFile(f, setFeeFile)}
+            />
             <div className="errmsg">Attach your deposit slip.</div>
             <div className="hint">Deposit the annual membership fee of Nu. 3,000 to the ABTO account, then attach the slip. You may also pay in person at the ABTO office during office hours.</div>
           </div>
@@ -250,7 +442,14 @@ export default function ApplicationWizard() {
           </div>
           <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
             <button type="button" className="btn btn-outline-dark" onClick={() => goto(2)}><span>Back</span></button>
-            <button type="button" className="btn" onClick={() => next(4)}><span>Review Application</span></button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => next(4)}
+              disabled={licenceFile.status === "uploading" || feeFile.status === "uploading"}
+            >
+              <span>Review Application</span>
+            </button>
           </div>
         </div>
 
@@ -271,14 +470,17 @@ export default function ApplicationWizard() {
               {row("Mobile", review.mobile)}
               {row("Address", review.address)}
               {row("Listing text", review.desc)}
-              {row("Licence document", licenceFile ? "licence-scan.pdf" : "")}
-              {row("Fee deposit slip", feeFile ? "deposit-slip.jpg" : "")}
+              {row("Licence document", licenceFile.name)}
+              {row("Fee deposit slip", feeFile.name)}
               <dt>Membership fee</dt><dd>Nu. 3,000 (annual)</dd>
             </dl>
           </div>
           <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap", marginTop: "1.6rem" }}>
-            <button type="button" className="btn btn-outline-dark" onClick={() => goto(3)}><span>Back</span></button>
-            <button type="submit" className="btn"><span>Submit Application</span><svg className="arw" width="16" height="12" aria-hidden="true"><use href="#i-arw" /></svg></button>
+            <button type="button" className="btn btn-outline-dark" onClick={() => goto(3)} disabled={submitting}><span>Back</span></button>
+            <button type="submit" className="btn" disabled={submitting}>
+              <span>{submitting ? "Submitting…" : "Submit Application"}</span>
+              <svg className="arw" width="16" height="12" aria-hidden="true"><use href="#i-arw" /></svg>
+            </button>
           </div>
         </div>
       </form>

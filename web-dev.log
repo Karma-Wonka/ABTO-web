@@ -70,3 +70,142 @@ See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode de
   digest: '2793631356'
 }
  GET / 500 in 940ms
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '1560017373'
+}
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '1560017373'
+}
+ GET / 500 in 951ms
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '1560017373'
+}
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '1560017373'
+}
+ GET / 500 in 1004ms
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '2793631356'
+}
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '2793631356'
+}
+ GET / 500 in 831ms
+   Reload env: .env.local
+ ✓ Compiled in 109ms (640 modules)
+ ✓ Compiled in 86ms (640 modules)
+   Reload env: .env.local
+ ✓ Compiled in 79ms (640 modules)
+ ✓ Compiled in 117ms (640 modules)
+ ✓ Compiled in 54ms (236 modules)
+ ✓ Compiled in 66ms (236 modules)
+ ✓ Compiled /api/membership in 321ms (662 modules)
+ GET /api/membership 405 in 608ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 503ms (646 modules)
+ ⨯ AggregateError: 
+    at async getLiveData (lib\live-data.ts:64:46)
+    at async RootLayout (app\layout.tsx:55:20)
+  62 |  */
+  63 | export const getLiveData = cache(async function getLiveData() {
+> 64 |   const [members, events, news, documents] = await Promise.all([
+     |                                              ^
+  65 |     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
+  66 |     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
+  67 |     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'), {
+  code: 'ETIMEDOUT',
+  digest: '4007993313'
+}
+ GET / 500 in 1577ms
+ ✓ Compiled in 124ms (237 modules)
+ ✓ Compiled in 156ms (641 modules)
+   Reload env: .env.local
+ ✓ Compiled in 131ms (641 modules)
+   Reload env: .env.local
+ ✓ Compiled in 89ms (641 modules)
+   Reload env: .env.local
+ ✓ Compiled in 73ms (641 modules)
+   Reload env: .env.local
+ ✓ Compiled in 78ms (641 modules)
+ ✓ Compiled in 200ms (237 modules)
+ ✓ Compiled in 143ms (641 modules)
+ ✓ Compiled in 113ms (641 modules)
+   Reload env: .env.local
+ ✓ Compiled in 74ms (641 modules)
+ ✓ Compiled in 81ms (641 modules)
+ ✓ Compiled in 233ms (404 modules)
+ ✓ Compiled in 567ms (465 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'D:\abto\web\.next\cache\webpack\server-development\0.pack.gz_' -> 'D:\abto\web\.next\cache\webpack\server-development\0.pack.gz'
+ ✓ Compiled in 124ms (465 modules)
+ ✓ Compiled in 246ms (702 modules)
+ ✓ Compiled in 127ms (702 modules)
+ ✓ Compiled in 120ms (702 modules)
+ ✓ Compiled in 122ms (702 modules)
+ ✓ Compiled in 93ms (702 modules)
+ ✓ Compiled in 101ms (404 modules)
+ ✓ Compiled in 62ms (404 modules)
+ ✓ Compiled in 69ms (404 modules)
+ ✓ Compiled in 127ms (641 modules)
+ ✓ Compiled in 109ms (641 modules)
+ ✓ Compiled in 169ms (641 modules)
+ ✓ Compiled in 97ms (641 modules)
+ ✓ Compiled in 150ms (641 modules)
+ ✓ Compiled in 105ms (641 modules)
+ ✓ Compiled in 76ms (237 modules)
+ ✓ Compiled in 107ms (641 modules)
+ ✓ Compiled in 76ms (641 modules)
+ ✓ Compiled in 155ms (641 modules)
