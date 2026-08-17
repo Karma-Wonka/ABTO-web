@@ -14,7 +14,7 @@ export default function Footer() {
           <div>
             <Link href="/" className="brand" style={{ marginBottom: "1.3rem" }}>
               <img className="brand-mark" src={BRAND_MARK} alt="ABTO logo" width={76} height={65} />
-              <span className="brand-txt"><b>ABTO</b><em>Bhutanese Tour Operators</em></span>
+              <span className="brand-txt"><b>ABTO</b><em>Bhutanese Tour Operator Association</em></span>
             </Link>
             <p style={{ fontSize: ".9rem", maxWidth: 330, lineHeight: 1.75 }}>
               The mutual and official voice of all Bhutanese tour operators. A not-for-profit organisation founded in 2000.

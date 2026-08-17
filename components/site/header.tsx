@@ -192,7 +192,7 @@ export default function Header({ liveData }: { liveData: LiveData }) {
             <img className="brand-mark" src={BRAND_MARK} alt="ABTO logo" width={76} height={65} />
             <span className="brand-txt">
               <b>ABTO</b>
-              <em>Bhutanese Tour Operators</em>
+              <em>Bhutanese Tour Operator Association</em>
             </span>
           </Link>
 
