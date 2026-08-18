@@ -45,6 +45,7 @@ type DocumentRow = {
   size: string | null;
   year: string | null;
   description: string | null;
+  image_key: string | null;
 };
 
 type FestivalRow = {
@@ -122,10 +123,14 @@ export const getLiveData = cache(async function getLiveData() {
     publications: documents.rows
       .filter((d) => d.kind === 'publication')
       .map((d) => ({
+        id: d.id,
         t: d.title,
         yr: d.year ?? '',
         x: d.description ?? '',
-        type: d.doc_type
+        type: d.doc_type,
+        // Never expose the raw R2 key here — resolved to a signed link
+        // per request by app/api/document-image/[id]/route.ts instead.
+        hasImage: !!d.image_key
       })),
     festivals: festivals.rows.map((f) => ({
       n: f.name,
