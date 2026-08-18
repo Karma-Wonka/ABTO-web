@@ -7,7 +7,7 @@ import FestivalsList from "./festivals-list";
 export const metadata = { title: "Festival Calendar" };
 
 export default async function FestivalsPage() {
-  const [session, { festivals, festivalCalendarPdf }] = await Promise.all([
+  const [session, { festivals, hasFestivalCalendarPdf }] = await Promise.all([
     getSession(),
     getLiveData()
   ]);
@@ -21,7 +21,7 @@ export default async function FestivalsPage() {
       />
       <section className="pad-s">
         {session ? (
-          <FestivalsList festivals={festivals} pdfUrl={festivalCalendarPdf} />
+          <FestivalsList festivals={festivals} hasCalendarPdf={hasFestivalCalendarPdf} />
         ) : (
           <div className="wrap">
             <div className="card" style={{ maxWidth: 560, textAlign: "center", padding: "clamp(2rem,4vw,3rem)" }}>

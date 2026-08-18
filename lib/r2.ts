@@ -8,10 +8,13 @@ declare global {
 
 /**
  * Cloudflare R2 client — R2 is S3-compatible, so the AWS SDK talks to it via
- * the account's R2 endpoint instead of an AWS region. Bucket stays private;
- * uploads are proxied through our own API route rather than a browser-facing
- * presigned URL, since these are membership application documents (licence
- * scans, bank deposit slips) that shouldn't be reachable by a guessable URL.
+ * the account's R2 endpoint instead of an AWS region. Bucket stays private.
+ * Uploads (membership application documents, under `membership/`) are
+ * proxied through our own API route rather than a browser-facing presigned
+ * URL, since those shouldn't be reachable by a guessable URL. Reads (the
+ * signed Festival Calendar PDF under `Festival Calender/`, uploaded from
+ * the admin dashboard) go out as short-lived presigned GET URLs instead,
+ * generated per request in app/api/festival-calendar/route.ts.
  */
 export function getR2Client() {
   if (!global.__r2Client) {

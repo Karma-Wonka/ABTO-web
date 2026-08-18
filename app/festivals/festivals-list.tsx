@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Festival } from "@/data/site-data";
 
-export default function FestivalsList({ festivals, pdfUrl }: { festivals: Festival[]; pdfUrl: string | null }) {
+export default function FestivalsList({ festivals, hasCalendarPdf }: { festivals: Festival[]; hasCalendarPdf: boolean }) {
   const [q, setQ] = useState("");
   const [year, setYear] = useState<"both" | "25" | "26">("both");
   const list = festivals.filter((f) => !q || (f.n + f.p + f.dz).toLowerCase().includes(q.toLowerCase()));
@@ -20,8 +20,8 @@ export default function FestivalsList({ festivals, pdfUrl }: { festivals: Festiv
             convenience view for planning only.
           </p>
         </div>
-        {pdfUrl ? (
-          <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-gold" style={{ flex: "none" }}>
+        {hasCalendarPdf ? (
+          <a href="/api/festival-calendar" target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-gold" style={{ flex: "none" }}>
             <span>Download Signed PDF</span>
           </a>
         ) : (
