@@ -46,6 +46,7 @@ type DocumentRow = {
   year: string | null;
   description: string | null;
   image_key: string | null;
+  file_key: string | null;
 };
 
 type FestivalRow = {
@@ -115,10 +116,14 @@ export const getLiveData = cache(async function getLiveData() {
     downloads: documents.rows
       .filter((d) => d.kind === 'download')
       .map((d) => ({
+        id: d.id,
         t: d.title,
         cat: d.category ?? '',
         size: d.size ?? '',
-        type: d.doc_type
+        type: d.doc_type,
+        // Never expose the raw R2 key here — resolved to a signed link
+        // per request by app/api/document-file/[id]/route.ts instead.
+        hasFile: !!d.file_key
       })),
     publications: documents.rows
       .filter((d) => d.kind === 'publication')
@@ -129,8 +134,9 @@ export const getLiveData = cache(async function getLiveData() {
         x: d.description ?? '',
         type: d.doc_type,
         // Never expose the raw R2 key here — resolved to a signed link
-        // per request by app/api/document-image/[id]/route.ts instead.
-        hasImage: !!d.image_key
+        // per request by app/api/document-image|file/[id]/route.ts instead.
+        hasImage: !!d.image_key,
+        hasFile: !!d.file_key
       })),
     festivals: festivals.rows.map((f) => ({
       n: f.name,

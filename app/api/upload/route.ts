@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const key = `membership/${Date.now()}-${randomUUID()}-${sanitizeName(file.name)}`;
+    const key = `Members/${Date.now()}-${randomUUID()}-${sanitizeName(file.name)}`;
     const body = new Uint8Array(await file.arrayBuffer());
 
     await getR2Client().send(

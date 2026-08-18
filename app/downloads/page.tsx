@@ -21,10 +21,16 @@ export default async function DownloadsPage() {
             <div key={cat} style={{ marginBottom: "2.4rem" }}>
               <div className="eyebrow">{cat}</div>
               {downloads.filter((d) => d.cat === cat).map((d) => (
-                <div className="doc" key={d.t}>
+                <div className="doc" key={d.id}>
                   <span className="dicon" style={{ color: "var(--kemar)" }}><svg width="30" height="38" aria-hidden="true"><use href="#i-doc" /></svg></span>
                   <div className="dinfo"><h5>{d.t}</h5><div className="dm"><span>{d.type} · {d.size}</span></div></div>
-                  <div className="dact"><button className="btn btn-sm"><span>Download</span></button></div>
+                  <div className="dact">
+                    {d.hasFile ? (
+                      <a href={`/api/document-file/${d.id}`} className="btn btn-sm"><span>Download</span></a>
+                    ) : (
+                      <button className="btn btn-sm" disabled title="Not yet uploaded"><span>Download</span></button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
