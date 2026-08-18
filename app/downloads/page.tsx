@@ -24,7 +24,13 @@ export default async function DownloadsPage() {
                 <div className="doc" key={d.t}>
                   <span className="dicon" style={{ color: "var(--kemar)" }}><svg width="30" height="38" aria-hidden="true"><use href="#i-doc" /></svg></span>
                   <div className="dinfo"><h5>{d.t}</h5><div className="dm"><span>{d.type} · {d.size}</span></div></div>
-                  <div className="dact"><button className="btn btn-sm"><span>Download</span></button></div>
+                  <div className="dact">
+                    {d.url ? (
+                      <a href={d.url} target="_blank" rel="noopener noreferrer" className="btn btn-sm"><span>Download</span></a>
+                    ) : (
+                      <button className="btn btn-sm" disabled title="Not yet uploaded"><span>Download</span></button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
