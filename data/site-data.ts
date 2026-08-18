@@ -94,28 +94,11 @@ export const CLASSIFIEDS: Classified[] = [
   { t: 'Camping kitchen and dining set', cat: 'Equipment', price: 'Nu. 95,000', loc: 'Bumthang', feat: false, x: 'Complete trek kitchen: stoves, gas, dining tent, tables and seating for twelve.', by: 'Member operator', d: '2025-04-08' }
 ];
 
+// Festival data itself now lives in the `festivals` table, managed from
+// the admin dashboard's Festival Calendar Manager (see lib/live-data.ts) —
+// this type is kept since it's still the shape festivals-list.tsx and
+// header.tsx's search index work with.
 export type Festival = { n: string; p: string; d25: string; d26: string; dz: string };
-
-export const FESTIVALS: Festival[] = [
-  { n: 'Punakha Drubchen', p: 'Punakha Dzong', d25: '05 – 07 Mar 2025', d26: '22 – 24 Feb 2026', dz: 'Punakha' },
-  { n: 'Punakha Tshechu', p: 'Punakha Dzong', d25: '08 – 10 Mar 2025', d26: '25 – 27 Feb 2026', dz: 'Punakha' },
-  { n: 'Paro Tshechu', p: 'Rinpung Dzong, Paro', d25: '09 – 13 Apr 2025', d26: '29 Mar – 02 Apr 2026', dz: 'Paro' },
-  { n: 'Domkhar Tshechu', p: 'Domkhar, Chumey', d25: '08 – 10 Apr 2025', d26: '28 – 30 Mar 2026', dz: 'Bumthang' },
-  { n: 'Ura Yakchoe', p: 'Ura Lhakhang', d25: '11 – 15 Apr 2025', d26: '31 Mar – 04 Apr 2026', dz: 'Bumthang' },
-  { n: 'Nimalung Tshechu', p: 'Nimalung Dratshang', d25: '04 – 06 Jul 2025', d26: '23 – 25 Jun 2026', dz: 'Bumthang' },
-  { n: 'Kurjey Tshechu', p: 'Kurjey Lhakhang', d25: '06 Jul 2025', d26: '25 Jun 2026', dz: 'Bumthang' },
-  { n: 'Haa Summer Festival', p: 'Haa Valley', d25: '12 – 13 Jul 2025', d26: '11 – 12 Jul 2026', dz: 'Haa' },
-  { n: 'Wangdue Tshechu', p: 'Tencholing Ground', d25: '01 – 03 Oct 2025', d26: '20 – 22 Sep 2026', dz: 'Wangdue' },
-  { n: 'Thimphu Drubchen', p: 'Tashichho Dzong', d25: '01 Oct 2025', d26: '20 Sep 2026', dz: 'Thimphu' },
-  { n: 'Thimphu Tshechu', p: 'Tashichho Dzong', d25: '03 – 05 Oct 2025', d26: '22 – 24 Sep 2026', dz: 'Thimphu' },
-  { n: 'Gangtey Tshechu', p: 'Gangtey Gonpa', d25: '05 – 07 Oct 2025', d26: '24 – 26 Sep 2026', dz: 'Wangdue' },
-  { n: 'Jakar Tshechu', p: 'Jakar Dzong', d25: '01 – 05 Nov 2025', d26: '21 – 25 Oct 2026', dz: 'Bumthang' },
-  { n: 'Black-Necked Crane Festival', p: 'Gangtey Gonpa, Phobjikha', d25: '11 Nov 2025', d26: '11 Nov 2026', dz: 'Wangdue' },
-  { n: 'Mongar Tshechu', p: 'Mongar Dzong', d25: '29 Nov – 02 Dec 2025', d26: '18 – 21 Nov 2026', dz: 'Mongar' },
-  { n: 'Trashigang Tshechu', p: 'Trashigang Dzong', d25: '30 Nov – 03 Dec 2025', d26: '19 – 22 Nov 2026', dz: 'Trashigang' },
-  { n: 'Lhuentse Tshechu', p: 'Lhuentse Dzong', d25: '28 – 30 Dec 2025', d26: '17 – 19 Dec 2026', dz: 'Lhuentse' },
-  { n: 'Trongsa Tshechu', p: 'Trongsa Dzong', d25: '29 – 31 Dec 2025', d26: '18 – 20 Dec 2026', dz: 'Trongsa' }
-];
 
 export type Destination = { t: string; x: string; tag: string };
 

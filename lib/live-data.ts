@@ -47,6 +47,16 @@ type DocumentRow = {
   description: string | null;
 };
 
+type FestivalRow = {
+  id: number;
+  name: string;
+  place: string;
+  dzongkhag: string;
+  date_2025: string | null;
+  date_2026: string | null;
+  display_order: number;
+};
+
 const CATEGORY_TAGS: Record<string, string> = {
   Policy: 't-yellow',
   Association: 't-red',
@@ -61,11 +71,13 @@ const CATEGORY_TAGS: Record<string, string> = {
  * dashboard (../ABTO) manages.
  */
 export const getLiveData = cache(async function getLiveData() {
-  const [members, events, news, documents] = await Promise.all([
+  const [members, events, news, documents, festivals, festivalCalendar] = await Promise.all([
     query<MemberRow>("SELECT * FROM members WHERE status = 'active' ORDER BY name"),
     query<EventRow>('SELECT * FROM events ORDER BY date DESC'),
     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'),
-    query<DocumentRow>('SELECT * FROM documents ORDER BY created_at DESC')
+    query<DocumentRow>('SELECT * FROM documents ORDER BY created_at DESC'),
+    query<FestivalRow>('SELECT * FROM festivals ORDER BY display_order ASC, name ASC'),
+    query<{ pdf_url: string | null }>('SELECT pdf_url FROM festival_calendar WHERE id = 1')
   ]);
 
   return {
@@ -114,7 +126,15 @@ export const getLiveData = cache(async function getLiveData() {
         yr: d.year ?? '',
         x: d.description ?? '',
         type: d.doc_type
-      }))
+      })),
+    festivals: festivals.rows.map((f) => ({
+      n: f.name,
+      p: f.place,
+      dz: f.dzongkhag,
+      d25: f.date_2025 ?? '',
+      d26: f.date_2026 ?? ''
+    })),
+    festivalCalendarPdf: festivalCalendar.rows[0]?.pdf_url ?? null
   };
 });
 

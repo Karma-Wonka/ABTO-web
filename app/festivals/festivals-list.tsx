@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FESTIVALS } from "@/data/site-data";
-import { useToast } from "@/components/site/toast";
+import type { Festival } from "@/data/site-data";
 
-export default function FestivalsList() {
+export default function FestivalsList({ festivals, pdfUrl }: { festivals: Festival[]; pdfUrl: string | null }) {
   const [q, setQ] = useState("");
   const [year, setYear] = useState<"both" | "25" | "26">("both");
-  const toast = useToast();
-  const list = FESTIVALS.filter((f) => !q || (f.n + f.p + f.dz).toLowerCase().includes(q.toLowerCase()));
+  const list = festivals.filter((f) => !q || (f.n + f.p + f.dz).toLowerCase().includes(q.toLowerCase()));
 
   return (
     <div className="wrap">
@@ -22,9 +20,15 @@ export default function FestivalsList() {
             convenience view for planning only.
           </p>
         </div>
-        <button className="btn btn-sm btn-gold" style={{ flex: "none" }} onClick={() => toast("Downloading Festival Dates 2025–2026")}>
-          <span>Download Signed PDF</span>
-        </button>
+        {pdfUrl ? (
+          <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-gold" style={{ flex: "none" }}>
+            <span>Download Signed PDF</span>
+          </a>
+        ) : (
+          <button className="btn btn-sm btn-gold" style={{ flex: "none" }} disabled title="Not yet uploaded">
+            <span>Download Signed PDF</span>
+          </button>
+        )}
       </div>
       <div className="toolbar">
         <div className="field has-icon">

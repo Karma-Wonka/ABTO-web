@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { POLICIES, FESTIVALS } from "@/data/site-data";
+import { POLICIES } from "@/data/site-data";
 import { BRAND_MARK } from "@/data/brand-mark";
 import type { LiveData } from "@/lib/live-data";
 
@@ -16,7 +16,7 @@ function buildSearchIndex(liveData: LiveData): SearchHit[] {
     ...liveData.news.map((n) => ({ t: n.t, ty: "News", h: "/news" })),
     ...POLICIES.map((p) => ({ t: p.t, ty: "Policy", h: "/policy" })),
     ...liveData.events.map((e) => ({ t: e.t, ty: "Event", h: "/events" })),
-    ...FESTIVALS.map((f) => ({ t: f.n, ty: "Festival", h: "/festivals" })),
+    ...liveData.festivals.map((f) => ({ t: f.n, ty: "Festival", h: "/festivals" })),
     ...liveData.publications.map((p) => ({ t: p.t, ty: "Publication", h: "/publications" })),
     ...liveData.downloads.map((d) => ({ t: d.t, ty: "Download", h: "/downloads" })),
     { t: "About ABTO", ty: "Page", h: "/about" },

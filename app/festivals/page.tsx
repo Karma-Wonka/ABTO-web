@@ -1,12 +1,16 @@
 import Link from "next/link";
 import PageHead from "@/components/site/page-head";
 import { getSession } from "@/lib/auth-session";
+import { getLiveData } from "@/lib/live-data";
 import FestivalsList from "./festivals-list";
 
 export const metadata = { title: "Festival Calendar" };
 
 export default async function FestivalsPage() {
-  const session = await getSession();
+  const [session, { festivals, festivalCalendarPdf }] = await Promise.all([
+    getSession(),
+    getLiveData()
+  ]);
 
   return (
     <div className="page on page-in">
@@ -17,7 +21,7 @@ export default async function FestivalsPage() {
       />
       <section className="pad-s">
         {session ? (
-          <FestivalsList />
+          <FestivalsList festivals={festivals} pdfUrl={festivalCalendarPdf} />
         ) : (
           <div className="wrap">
             <div className="card" style={{ maxWidth: 560, textAlign: "center", padding: "clamp(2rem,4vw,3rem)" }}>
