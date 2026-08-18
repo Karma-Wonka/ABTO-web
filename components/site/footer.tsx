@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BRAND_MARK } from "@/data/brand-mark";
+import { FOOTER_BRAND_MARK } from "@/data/footer-brand-mark";
 
 export default function Footer() {
   return (
@@ -13,7 +13,7 @@ export default function Footer() {
         <div className="fmain">
           <div>
             <Link href="/" className="brand" style={{ marginBottom: "1.3rem" }}>
-              <img className="brand-mark" src={BRAND_MARK} alt="ABTO logo" width={76} height={65} />
+              <img className="brand-mark" src={FOOTER_BRAND_MARK} alt="ABTO logo" width={76} height={65} />
               <span className="brand-txt"><b>ABTO</b><em>Bhutanese Tour Operator Association</em></span>
             </Link>
             <p style={{ fontSize: ".9rem", maxWidth: 330, lineHeight: 1.75 }}>
