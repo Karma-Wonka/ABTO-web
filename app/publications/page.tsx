@@ -26,11 +26,7 @@ export default async function PublicationsPage() {
                 </div>
                 <div style={{ padding: "1.5rem" }}>
                   <span className="num">{p.yr}</span><h3>{p.t}</h3><p style={{ fontSize: ".87rem" }}>{p.x}</p>
-                  {p.url ? (
-                    <a href={p.url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-dark" style={{ marginTop: "1rem" }}><span>Download</span></a>
-                  ) : (
-                    <button className="btn btn-sm btn-outline-dark" style={{ marginTop: "1rem" }} disabled title="Not yet uploaded"><span>Download</span></button>
-                  )}
+                  <button className="btn btn-sm btn-outline-dark" style={{ marginTop: "1rem" }}><span>Download</span></button>
                 </div>
               </article>
             ))}

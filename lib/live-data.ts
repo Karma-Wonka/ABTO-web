@@ -38,14 +38,13 @@ type NewsRow = {
 
 type DocumentRow = {
   id: number;
-  kind: 'download' | 'publication' | 'calendar';
+  kind: 'download' | 'publication';
   title: string;
   category: string | null;
   doc_type: string;
   size: string | null;
   year: string | null;
   description: string | null;
-  file_url: string | null;
 };
 
 const CATEGORY_TAGS: Record<string, string> = {
@@ -106,8 +105,7 @@ export const getLiveData = cache(async function getLiveData() {
         t: d.title,
         cat: d.category ?? '',
         size: d.size ?? '',
-        type: d.doc_type,
-        url: d.file_url
+        type: d.doc_type
       })),
     publications: documents.rows
       .filter((d) => d.kind === 'publication')
@@ -115,16 +113,8 @@ export const getLiveData = cache(async function getLiveData() {
         t: d.title,
         yr: d.year ?? '',
         x: d.description ?? '',
-        type: d.doc_type,
-        url: d.file_url
-      })),
-    // The single current Event Calendar PDF, set from the admin dashboard's
-    // Documents screen (kind: 'calendar'). If more than one exists, the
-    // most recently created wins.
-    eventCalendar: (() => {
-      const d = documents.rows.find((row) => row.kind === 'calendar' && row.file_url);
-      return d ? { title: d.title, url: d.file_url as string } : null;
-    })()
+        type: d.doc_type
+      }))
   };
 });
 
