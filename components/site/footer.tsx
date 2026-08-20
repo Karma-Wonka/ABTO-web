@@ -25,7 +25,7 @@ export default function Footer() {
                   <svg width="14" height="16" aria-hidden="true"><use href="#i-pin" /></svg>
                 </span>
                 <span>
-                  Drimey Lam, Thimphu <em style={{ fontSize: ".82em", opacity: 0.7 }}>(street address to be confirmed)</em>
+                  Drimey Lam, Thimphu
                   <br />PO Box 938<br />Kingdom of Bhutan
                 </span>
               </div>
