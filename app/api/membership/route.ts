@@ -23,6 +23,23 @@ async function ensureAuthUsersTable() {
   `);
 }
 
+// Mirrors the notifications table owned by the ABTO admin dashboard
+// (../abtotest, src/lib/db.ts) so a new submission shows up in its
+// notification bell without going through admin's own API.
+async function ensureNotificationsTable() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id SERIAL PRIMARY KEY,
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT,
+      link TEXT,
+      is_read BOOLEAN NOT NULL DEFAULT false,
+      created_at TEXT NOT NULL
+    )
+  `);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => null);
@@ -39,9 +56,15 @@ export async function POST(request: NextRequest) {
     const message = clean(body.message);
     const password = typeof body.password === "string" ? body.password : "";
 
-    if (!company || !person || !email) {
+    if (!person || !email || (kind === "membership" && !company)) {
       return NextResponse.json(
-        { success: false, message: "Company, contact name and email are required." },
+        {
+          success: false,
+          message:
+            kind === "membership"
+              ? "Company, contact name and email are required."
+              : "Name and email are required."
+        },
         { status: 400 }
       );
     }
@@ -126,6 +149,23 @@ export async function POST(request: NextRequest) {
         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, NOW())
       `,
       [kind, person, email, phone || null, company, message || null, JSON.stringify(payload)]
+    );
+
+    await ensureNotificationsTable();
+    await query(
+      `
+        INSERT INTO notifications (type, title, body, link, created_at)
+        VALUES ($1, $2, $3, $4, $5)
+      `,
+      [
+        "submission",
+        kind === "membership"
+          ? `New membership application: ${company || person}`
+          : `New contact message from ${person}`,
+        message || null,
+        "/dashboard/submissions",
+        new Date().toISOString()
+      ]
     );
 
     return NextResponse.json(

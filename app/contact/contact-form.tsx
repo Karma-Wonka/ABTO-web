@@ -1,21 +1,48 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useToast } from "@/components/site/toast";
 import { validateForm } from "@/lib/validate";
 
 export default function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const toast = useToast();
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm(e.currentTarget)) {
       toast("Please complete the highlighted fields.");
       return;
     }
-    formRef.current?.reset();
-    toast("Message sent. The secretariat will respond within two working days.");
+
+    const data = new FormData(e.currentTarget);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/membership", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "contact",
+          name: String(data.get("name") || ""),
+          email: String(data.get("email") || ""),
+          company: String(data.get("org") || ""),
+          message: String(data.get("msg") || ""),
+          payload: { subject: String(data.get("subject") || "") }
+        })
+      });
+      const result = await res.json().catch(() => ({ success: false, message: "" }));
+      if (!res.ok || !result.success) {
+        toast(result.message || "Unable to send your message. Please try again.");
+        return;
+      }
+      formRef.current?.reset();
+      toast("Message sent. The secretariat will respond within two working days.");
+    } catch {
+      toast("Unable to reach the server. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -42,8 +69,8 @@ export default function ContactForm() {
         </div>
       </div>
       <div className="fgroup"><label>Message <span className="req">*</span></label><textarea name="msg" required /><div className="errmsg">Please write your message.</div></div>
-      <button className="btn" type="submit">
-        <span>Send Message</span>
+      <button className="btn" type="submit" disabled={submitting}>
+        <span>{submitting ? "Sending…" : "Send Message"}</span>
         <svg className="arw" width="16" height="12" aria-hidden="true"><use href="#i-arw" /></svg>
       </button>
     </form>
