@@ -37,6 +37,10 @@ export default function Footer() {
                 <span style={{ color: "var(--kemar)", flex: "none" }}><svg width="15" height="14" aria-hidden="true"><use href="#i-mail" /></svg></span>
                 <a href="mailto:info@abto.org.bt" style={{ padding: 0 }}>info@abto.org.bt</a>
               </div>
+              <div style={{ display: "flex", gap: ".7rem", alignItems: "center" }}>
+                <span style={{ color: "var(--kemar)", flex: "none" }}><svg width="15" height="14" aria-hidden="true"><use href="#i-mail" /></svg></span>
+                <a href="mailto:ed@abto.org.bt" style={{ padding: 0 }}>ed@abto.org.bt</a>
+              </div>
             </div>
           </div>
           <div>
