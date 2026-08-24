@@ -38,7 +38,6 @@ function EnquiryModal({ name }: { name: string }) {
           </div>
           <div className="fgroup"><label>Your enquiry <span className="req">*</span></label><textarea name="msg" required placeholder="Party size, interests, any trekking or festival preferences…" /><div className="errmsg">Please tell the operator what you are looking for.</div></div>
           <button className="btn" type="submit" style={{ width: "100%", justifyContent: "center" }}><span>Send Enquiry</span></button>
-          <p className="small" style={{ color: "var(--stone)", marginTop: ".9rem" }}>Your enquiry is routed to the operator and copied to the ABTO secretariat for quality monitoring.</p>
         </form>
       </div>
     </div>
