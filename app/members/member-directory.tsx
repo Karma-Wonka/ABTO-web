@@ -3,49 +3,14 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SPECS, REGIONS } from "@/data/site-data";
-import { useModal, useCloseModal } from "@/components/site/modal";
-import { useToast } from "@/components/site/toast";
-import { validateForm } from "@/lib/validate";
+import { useModal } from "@/components/site/modal";
 import type { LiveData } from "@/lib/live-data";
 
 type Member = LiveData["members"][number];
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const PER_PAGE = 12;
 
-function EnquiryModal({ name }: { name: string }) {
-  const close = useCloseModal();
-  const toast = useToast();
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!validateForm(e.currentTarget)) return;
-    close();
-    toast(`Enquiry sent to ${name}. Most members reply within two working days.`);
-  };
-
-  return (
-    <div>
-      <div className="mhead"><div className="eyebrow">Enquiry</div><h2 className="display-m">Contact {name}</h2></div>
-      <div className="mbody">
-        <form onSubmit={onSubmit} noValidate>
-          <div className="frow">
-            <div className="fgroup"><label>Your name <span className="req">*</span></label><input name="name" required /><div className="errmsg">Please enter your name.</div></div>
-            <div className="fgroup"><label>Email <span className="req">*</span></label><input type="email" name="email" required /><div className="errmsg">Please enter a valid email.</div></div>
-          </div>
-          <div className="frow">
-            <div className="fgroup"><label>Country</label><input name="country" placeholder="e.g. Germany" /></div>
-            <div className="fgroup"><label>Approximate travel dates</label><input name="dates" placeholder="e.g. Oct 2025, 10 nights" /></div>
-          </div>
-          <div className="fgroup"><label>Your enquiry <span className="req">*</span></label><textarea name="msg" required placeholder="Party size, interests, any trekking or festival preferences…" /><div className="errmsg">Please tell the operator what you are looking for.</div></div>
-          <button className="btn" type="submit" style={{ width: "100%", justifyContent: "center" }}><span>Send Enquiry</span></button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 function MemberModal({ member }: { member: Member }) {
-  const openModal = useModal();
   return (
     <div>
       <div className="mhead">
@@ -65,9 +30,6 @@ function MemberModal({ member }: { member: Member }) {
           {member.email && <><dt style={{ fontFamily: "var(--f-util)", fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--stone)" }}>Email</dt><dd style={{ margin: 0 }}>{member.email}</dd></>}
           {member.web && <><dt style={{ fontFamily: "var(--f-util)", fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--stone)" }}>Website</dt><dd style={{ margin: 0 }}>{member.web}</dd></>}
         </dl>
-        <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap", marginTop: "1.4rem" }}>
-          <button className="btn btn-sm" onClick={() => openModal(<EnquiryModal name={member.name} />)}><span>Send an Enquiry</span></button>
-        </div>
       </div>
     </div>
   );
