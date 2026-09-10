@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { getSession } from "@/lib/auth-session";
+// import { getSession } from "@/lib/auth-session";
 import { getR2Client, R2_BUCKET } from "@/lib/r2";
 import { query } from "@/lib/postgres";
 
-// Members-only, matching /festivals itself — redirects to a freshly signed,
-// short-lived R2 URL rather than storing a permanent public link, since the
-// bucket stays private (see lib/r2.ts).
+// Open to all visitors, matching /festivals itself — redirects to a freshly
+// signed, short-lived R2 URL rather than storing a permanent public link,
+// since the bucket stays private (see lib/r2.ts).
 export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ success: false, message: "Sign in required." }, { status: 401 });
-  }
+  // Members-only gate disabled — festival calendar PDF is now public.
+  // const session = await getSession();
+  // if (!session) {
+  //   return NextResponse.json({ success: false, message: "Sign in required." }, { status: 401 });
+  // }
 
   const { rows } = await query<{ pdf_key: string | null }>(
     "SELECT pdf_key FROM festival_calendar WHERE id = 1"

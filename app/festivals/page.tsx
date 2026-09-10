@@ -1,16 +1,18 @@
-import Link from "next/link";
+// import Link from "next/link";
 import PageHead from "@/components/site/page-head";
-import { getSession } from "@/lib/auth-session";
+// import { getSession } from "@/lib/auth-session";
 import { getLiveData } from "@/lib/live-data";
 import FestivalsList from "./festivals-list";
 
 export const metadata = { title: "Festival Calendar" };
 
 export default async function FestivalsPage() {
-  const [session, { festivals, hasFestivalCalendarPdf }] = await Promise.all([
-    getSession(),
-    getLiveData()
-  ]);
+  // Members-only gate disabled — festival calendar is now open to all visitors.
+  // const [session, { festivals, hasFestivalCalendarPdf }] = await Promise.all([
+  //   getSession(),
+  //   getLiveData()
+  // ]);
+  const { festivals, hasFestivalCalendarPdf } = await getLiveData();
 
   return (
     <div className="page on page-in">
@@ -20,6 +22,8 @@ export default async function FestivalsPage() {
         intro="Mask dance festivals across the dzongkhags. Dates are tentative until confirmed by the respective dzong. Always reconfirm with your operator before committing a group."
       />
       <section className="pad-s">
+        <FestivalsList festivals={festivals} hasCalendarPdf={hasFestivalCalendarPdf} />
+        {/*
         {session ? (
           <FestivalsList festivals={festivals} hasCalendarPdf={hasFestivalCalendarPdf} />
         ) : (
@@ -38,6 +42,7 @@ export default async function FestivalsPage() {
             </div>
           </div>
         )}
+        */}
       </section>
     </div>
   );
