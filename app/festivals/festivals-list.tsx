@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react";
 import type { Festival } from "@/data/site-data";
 
 export default function FestivalsList({ festivals, hasCalendarPdf }: { festivals: Festival[]; hasCalendarPdf: boolean }) {
-  const [q, setQ] = useState("");
-  const [year, setYear] = useState<"both" | "25" | "26">("both");
-  const list = festivals.filter((f) => !q || (f.n + f.p + f.dz).toLowerCase().includes(q.toLowerCase()));
+  // const [q, setQ] = useState("");
+  // const [year, setYear] = useState<"both" | "25" | "26">("both");
+  // const list = festivals.filter((f) => !q || (f.n + f.p + f.dz).toLowerCase().includes(q.toLowerCase()));
+  void festivals;
 
   return (
     <div className="wrap">
@@ -16,8 +17,7 @@ export default function FestivalsList({ festivals, hasCalendarPdf }: { festivals
           <h3 style={{ marginBottom: ".3rem" }}>Signed Festival Calendar (PDF)</h3>
           <p style={{ fontSize: ".9rem", color: "rgba(246,242,233,.72)", margin: 0, maxWidth: "58ch" }}>
             Uploaded by authorised ABTO staff and carrying the signature and approval of the responsible officer.
-            This PDF is the official record of festival dates, not the table below, which is a searchable
-            convenience view for planning only.
+            This PDF is the official record of festival dates.
           </p>
         </div>
         {hasCalendarPdf ? (
@@ -30,6 +30,7 @@ export default function FestivalsList({ festivals, hasCalendarPdf }: { festivals
           </button>
         )}
       </div>
+      {/*
       <div className="toolbar">
         <div className="field has-icon">
           <span className="ic"><svg width="18" height="18" aria-hidden="true"><use href="#i-search" /></svg></span>
@@ -70,6 +71,7 @@ export default function FestivalsList({ festivals, hasCalendarPdf }: { festivals
         This table mirrors the signed PDF above for convenient searching. If the two ever disagree, the signed PDF
         governs. Photography inside temples and during certain dances is restricted; your guide will advise on site.
       </p>
+      */}
     </div>
   );
 }
