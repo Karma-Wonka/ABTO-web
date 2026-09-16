@@ -5,6 +5,7 @@ import { getLiveData } from "@/lib/live-data";
 import FestivalsList from "./festivals-list";
 
 export const metadata = { title: "Festival Calendar" };
+export const revalidate = 60;
 
 export default async function FestivalsPage() {
   // Members-only gate disabled — festival calendar is now open to all visitors.
