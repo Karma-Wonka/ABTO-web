@@ -79,7 +79,9 @@ export const getLiveData = cache(async function getLiveData() {
     query<NewsRow>('SELECT * FROM news ORDER BY date DESC'),
     query<DocumentRow>('SELECT * FROM documents ORDER BY created_at DESC'),
     query<FestivalRow>('SELECT * FROM festivals ORDER BY display_order ASC, name ASC'),
-    query<{ pdf_key: string | null }>('SELECT pdf_key FROM festival_calendar WHERE id = 1')
+    query<{ pdf_key: string | null; pdf_key_2: string | null }>(
+      'SELECT pdf_key, pdf_key_2 FROM festival_calendar WHERE id = 1'
+    )
   ]);
 
   return {
@@ -148,7 +150,8 @@ export const getLiveData = cache(async function getLiveData() {
     // Never expose the raw R2 key/URL here — the bucket is private, so the
     // actual link is signed fresh per request behind a member-only route
     // (app/api/festival-calendar/route.ts). This just says whether one exists.
-    hasFestivalCalendarPdf: !!festivalCalendar.rows[0]?.pdf_key
+    hasFestivalCalendarPdf: !!festivalCalendar.rows[0]?.pdf_key,
+    hasFestivalCalendarPdfNextYear: !!festivalCalendar.rows[0]?.pdf_key_2
   };
 });
 

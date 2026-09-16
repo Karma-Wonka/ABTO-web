@@ -12,7 +12,7 @@ export default async function FestivalsPage() {
   //   getSession(),
   //   getLiveData()
   // ]);
-  const { festivals, hasFestivalCalendarPdf } = await getLiveData();
+  const { festivals, hasFestivalCalendarPdf, hasFestivalCalendarPdfNextYear } = await getLiveData();
 
   return (
     <div className="page on page-in">
@@ -22,10 +22,18 @@ export default async function FestivalsPage() {
         intro="Mask dance festivals across the dzongkhags. Dates are tentative until confirmed by the respective dzong. Always reconfirm with your operator before committing a group."
       />
       <section className="pad-s">
-        <FestivalsList festivals={festivals} hasCalendarPdf={hasFestivalCalendarPdf} />
+        <FestivalsList
+          festivals={festivals}
+          hasCalendarPdf={hasFestivalCalendarPdf}
+          hasCalendarPdfNextYear={hasFestivalCalendarPdfNextYear}
+        />
         {/*
         {session ? (
-          <FestivalsList festivals={festivals} hasCalendarPdf={hasFestivalCalendarPdf} />
+          <FestivalsList
+            festivals={festivals}
+            hasCalendarPdf={hasFestivalCalendarPdf}
+            hasCalendarPdfNextYear={hasFestivalCalendarPdfNextYear}
+          />
         ) : (
           <div className="wrap">
             <div className="card" style={{ maxWidth: 560, textAlign: "center", padding: "clamp(2rem,4vw,3rem)" }}>
