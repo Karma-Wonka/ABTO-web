@@ -4,6 +4,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getR2Client, R2_BUCKET } from "@/lib/r2";
 import { getSession } from "@/lib/auth-session";
 import { query } from "@/lib/postgres";
+import { ensureMemberLogoColumn } from "@/lib/member-logo-column";
 
 const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
 // No SVG: it can carry script and is served from our own signed-URL redirect.
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "Logo too large. Maximum size is 2MB." }, { status: 400 });
     }
 
+    await ensureMemberLogoColumn();
     const key = `Logos/${Date.now()}-${randomUUID()}.${ext}`;
     await getR2Client().send(
       new PutObjectCommand({
@@ -58,6 +60,7 @@ export async function DELETE() {
   if (!session) {
     return NextResponse.json({ success: false, message: "Please sign in." }, { status: 401 });
   }
+  await ensureMemberLogoColumn();
   await query("UPDATE members SET logo_key = NULL WHERE lower(email) = lower($1)", [session.email]);
   return NextResponse.json({ success: true });
 }

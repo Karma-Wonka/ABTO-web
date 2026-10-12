@@ -89,6 +89,7 @@ export default function ApplicationWizard() {
   const [langs, setLangs] = useState<string[]>([]);
   const [licenceFile, setLicenceFile] = useState<UploadState>(emptyUpload);
   const [feeFile, setFeeFile] = useState<UploadState>(emptyUpload);
+  const [logoFile, setLogoFile] = useState<UploadState>(emptyUpload);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [review, setReview] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
@@ -212,7 +213,8 @@ export default function ApplicationWizard() {
             licenceFileKey: licenceFile.key,
             licenceFileName: licenceFile.name,
             feeFileKey: feeFile.key,
-            feeFileName: feeFile.name
+            feeFileName: feeFile.name,
+            logoKey: logoFile.key
           }
         })
       });
@@ -229,6 +231,7 @@ export default function ApplicationWizard() {
       setLangs([]);
       setLicenceFile(emptyUpload);
       setFeeFile(emptyUpload);
+      setLogoFile(emptyUpload);
       setErrors({});
       setReview({});
       setMaxStep(1);
@@ -412,6 +415,16 @@ export default function ApplicationWizard() {
         </div>
 
         <div className="pane" data-pane="3" style={{ display: step === 3 ? "block" : "none" }}>
+          <div className="fgroup">
+            <label>Company logo <span className="hint" style={{ display: "inline" }}>(optional)</span></label>
+            <FileDropzone
+              label="Click to attach, or drag your logo (PNG, JPG or WEBP)"
+              accept=".jpg,.jpeg,.png,.webp"
+              state={logoFile}
+              onFile={(f) => uploadFile(f, setLogoFile)}
+            />
+            <div className="hint">Shown beside your company in the public Member Directory once approved. You can change it later from your profile.</div>
+          </div>
           <div className={`fgroup ${errors.licenceFile ? "err" : ""}`}>
             <label>Scanned tour operation licence <span className="req">*</span></label>
             <FileDropzone
@@ -446,7 +459,7 @@ export default function ApplicationWizard() {
               type="button"
               className="btn"
               onClick={() => next(4)}
-              disabled={licenceFile.status === "uploading" || feeFile.status === "uploading"}
+              disabled={licenceFile.status === "uploading" || feeFile.status === "uploading" || logoFile.status === "uploading"}
             >
               <span>Review Application</span>
             </button>

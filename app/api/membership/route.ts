@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { query } from "@/lib/postgres";
+import { ensureMemberLogoColumn } from "@/lib/member-logo-column";
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -74,6 +75,10 @@ export async function POST(request: NextRequest) {
     const website = clean(payloadIn.website);
     const specialties = Array.isArray(payloadIn.specialties) ? payloadIn.specialties : [];
     const languages = Array.isArray(payloadIn.languages) ? payloadIn.languages : [];
+    // Optional logo, uploaded beforehand via /api/upload. Only accept keys that
+    // route produced (Members/ prefix) and that are images.
+    const rawLogo = clean(payloadIn.logoKey);
+    const logoKey = /^Members\/[^/]+\.(png|jpe?g|webp)$/i.test(rawLogo) ? rawLogo : null;
 
     if (kind === "membership") {
       if (password.length < 8) {
@@ -119,14 +124,15 @@ export async function POST(request: NextRequest) {
         [email.toLowerCase(), passwordHash, person, now]
       );
 
+      await ensureMemberLogoColumn();
       // Applicant isn't a listed member yet — this row is 'pending' until
       // the secretariat verifies the licence/deposit slip in the
       // Submissions viewer and flips it to 'active' via the Members form.
       await query(
         `
           INSERT INTO members
-            (name, region, phone, email, website, description, specialties, languages, member_since, status, created_at, updated_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7::text, $8::text, $9, 'pending', $10, $10)
+            (name, region, phone, email, website, description, specialties, languages, member_since, status, created_at, updated_at, logo_key)
+          VALUES ($1, $2, $3, $4, $5, $6, $7::text, $8::text, $9, 'pending', $10, $10, $11)
         `,
         [
           company,
@@ -138,7 +144,8 @@ export async function POST(request: NextRequest) {
           JSON.stringify(specialties),
           JSON.stringify(languages),
           new Date().getFullYear(),
-          now
+          now,
+          logoKey
         ]
       );
     }
