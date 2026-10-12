@@ -4,16 +4,27 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SPECS, REGIONS } from "@/data/site-data";
 import { useModal } from "@/components/site/modal";
+import { externalUrl } from "@/lib/external-url";
 import type { LiveData } from "@/lib/live-data";
 
 type Member = LiveData["members"][number];
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const PER_PAGE = 12;
 
+function Logo({ member, size }: { member: Member; size: number }) {
+  return member.hasLogo ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img className="mlogo" src={`/api/member-logo/${member.id}`} alt={`${member.name} logo`} width={size} height={size} loading="lazy" />
+  ) : (
+    <span className="init" aria-hidden="true">{member.name[0]}</span>
+  );
+}
+
 function MemberModal({ member }: { member: Member }) {
   return (
     <div>
       <div className="mhead">
+        <div style={{ marginBottom: "1rem" }}><Logo member={member} size={72} /></div>
         <div className="eyebrow">Member Operator</div>
         <h2 className="display-m">{member.name}</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: ".4rem", marginTop: "1rem" }}>
@@ -28,7 +39,7 @@ function MemberModal({ member }: { member: Member }) {
           <dt style={{ fontFamily: "var(--f-util)", fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--stone)" }}>Languages</dt><dd style={{ margin: 0 }}>{member.langs.join(", ")}</dd>
           {member.phone && <><dt style={{ fontFamily: "var(--f-util)", fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--stone)" }}>Telephone</dt><dd style={{ margin: 0 }}>{member.phone}</dd></>}
           {member.email && <><dt style={{ fontFamily: "var(--f-util)", fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--stone)" }}>Email</dt><dd style={{ margin: 0 }}>{member.email}</dd></>}
-          {member.web && <><dt style={{ fontFamily: "var(--f-util)", fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--stone)" }}>Website</dt><dd style={{ margin: 0 }}>{member.web}</dd></>}
+          {member.web && <><dt style={{ fontFamily: "var(--f-util)", fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--stone)" }}>Website</dt><dd style={{ margin: 0 }}>{externalUrl(member.web) ? <a href={externalUrl(member.web)!} target="_blank" rel="noopener noreferrer" style={{ color: "var(--kemar)", overflowWrap: "anywhere" }}>{member.web}</a> : member.web}</dd></>}
         </dl>
       </div>
     </div>
@@ -105,40 +116,43 @@ export default function MemberDirectory({ members }: { members: Member[] }) {
         {filtered.length > PER_PAGE ? ` · page ${currentPage} of ${pages}` : ""}
       </div>
 
-      <div className="mgrid">
-        {slice.length ? (
-          slice.map((m) => (
-            <article
-              className="mcard"
-              key={m.id}
-              tabIndex={0}
-              role="button"
-              aria-label={`View ${m.name}`}
-              onClick={() => openModal(<MemberModal member={m} />)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  openModal(<MemberModal member={m} />);
-                }
-              }}
-            >
-              <div style={{ display: "flex", gap: ".9rem", alignItems: "flex-start" }}>
-                <span className="init">{m.name[0]}</span>
-                <h4>{m.name}</h4>
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: ".3rem" }}>
-                {m.specs.slice(0, 2).map((s) => <span className="tag t-green" key={s}>{s}</span>)}
-              </div>
-              <div className="m-meta"><span>{m.region}</span><span>Member since {m.since}</span></div>
-            </article>
-          ))
-        ) : (
-          <div style={{ gridColumn: "1/-1", background: "var(--paper)", padding: "3rem 1.5rem", textAlign: "center" }}>
-            <p className="display-s" style={{ marginBottom: ".6rem" }}>No operators match those filters</p>
-            <p className="small" style={{ color: "var(--stone)" }}>Clear a filter or search a different company name.</p>
-          </div>
-        )}
-      </div>
+      {slice.length ? (
+        <div className="mtable-wrap">
+          <table className="mtable">
+            <thead>
+              <tr><th scope="col">No.</th><th scope="col">Company</th><th scope="col">Specialties</th><th scope="col">Base</th><th scope="col">Since</th></tr>
+            </thead>
+            <tbody>
+              {slice.map((m, i) => (
+                <tr
+                  key={m.id}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`View ${m.name}`}
+                  onClick={() => openModal(<MemberModal member={m} />)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openModal(<MemberModal member={m} />);
+                    }
+                  }}
+                >
+                  <td className="num">{(currentPage - 1) * PER_PAGE + i + 1}</td>
+                  <td><span className="mname"><Logo member={m} size={36} /><span>{m.name}</span></span></td>
+                  <td>{m.specs.slice(0, 2).join(", ")}</td>
+                  <td>{m.region}</td>
+                  <td>{m.since}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div style={{ background: "var(--paper)", padding: "3rem 1.5rem", textAlign: "center" }}>
+          <p className="display-s" style={{ marginBottom: ".6rem" }}>No operators match those filters</p>
+          <p className="small" style={{ color: "var(--stone)" }}>Clear a filter or search a different company name.</p>
+        </div>
+      )}
 
       {pages > 1 && (
         <div className="pager">

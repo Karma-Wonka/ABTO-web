@@ -3,10 +3,13 @@ import PageHead from "@/components/site/page-head";
 import { getSession } from "@/lib/auth-session";
 import { query } from "@/lib/postgres";
 import SignOutButton from "./sign-out-button";
+import LogoUpload from "./logo-upload";
 
 export const metadata = { title: "My Account" };
 
 type MemberRow = {
+  id: number;
+  logo_key?: string | null; // absent until migrations/001-member-logo.sql has run
   name: string;
   region: string;
   phone: string;
@@ -20,7 +23,7 @@ export default async function ProfilePage() {
   if (!session) redirect("/login?next=/profile");
 
   const { rows } = await query<MemberRow>(
-    "SELECT name, region, phone, email, member_since, status FROM members WHERE lower(email) = lower($1)",
+    "SELECT * FROM members WHERE lower(email) = lower($1)",
     [session.email]
   );
   const member = rows[0];
@@ -68,6 +71,12 @@ export default async function ProfilePage() {
                   <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}><dt style={{ color: "#5A655E" }}>Phone</dt><dd style={{ margin: 0 }}>{member.phone}</dd></div>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}><dt style={{ color: "#5A655E" }}>Member since</dt><dd style={{ margin: 0 }}>{member.member_since}</dd></div>
                 </dl>
+              </div>
+
+              <div className="card" style={{ padding: "clamp(1.6rem,3vw,2.2rem)", marginBottom: "1.4rem" }}>
+                <div className="eyebrow">Company Logo</div>
+                <h3 style={{ margin: ".5rem 0 1rem" }}>Your logo in the directory</h3>
+                <LogoUpload memberId={member.id} hasLogo={!!member.logo_key} />
               </div>
 
               <div className="card" style={{ padding: "clamp(1.6rem,3vw,2.2rem)" }}>

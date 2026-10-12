@@ -14,6 +14,8 @@ type MemberRow = {
   languages: string;
   member_since: number;
   status: string;
+  // Added by migrations/001-member-logo.sql; undefined until that has run.
+  logo_key?: string | null;
 };
 
 type EventRow = {
@@ -96,6 +98,8 @@ export const getLiveData = cache(async function getLiveData() {
       specs: JSON.parse(m.specialties) as string[],
       since: m.member_since,
       sample: false,
+      // Raw R2 key never leaves the server — logos are served via /api/member-logo/[id].
+      hasLogo: !!m.logo_key,
       langs: JSON.parse(m.languages) as string[]
     })),
     events: events.rows.map((e) => ({
