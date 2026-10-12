@@ -35,7 +35,7 @@ export default function TravelSection() {
           </p>
         </div>
         <div className="grid-2" style={{ marginBottom: "1.6rem" }}>
-          <Link href="/travel#drukair" className="card rv" style={{ display: "flex", gap: "1.4rem", alignItems: "flex-start" }}>
+          <a href="https://drukair.com.bt" target="_blank" rel="noopener noreferrer" className="card rv" style={{ display: "flex", gap: "1.4rem", alignItems: "flex-start" }}>
             <span style={{ color: "var(--kemar)", flex: "none", marginTop: 4 }}>
               <svg width="26" height="26" aria-hidden="true"><use href="#i-plane" /></svg>
             </span>
@@ -47,8 +47,8 @@ export default function TravelSection() {
                 Kolkata, Guwahati, Bagdogra and Gaya. Domestic service to Bumthang, Gelephu and Yonphula.
               </p>
             </span>
-          </Link>
-          <Link href="/travel#tashiair" className="card rv" style={{ display: "flex", gap: "1.4rem", alignItems: "flex-start" }}>
+          </a>
+          <a href="https://www.bhutanairlines.bt" target="_blank" rel="noopener noreferrer" className="card rv" style={{ display: "flex", gap: "1.4rem", alignItems: "flex-start" }}>
             <span style={{ color: "var(--kemar)", flex: "none", marginTop: 4 }}>
               <svg width="26" height="26" aria-hidden="true"><use href="#i-plane" /></svg>
             </span>
@@ -60,7 +60,7 @@ export default function TravelSection() {
                 and Kolkata. Schedules are seasonal, confirm with your operator.
               </p>
             </span>
-          </Link>
+          </a>
         </div>
         <div className="grid-4" style={{ marginBottom: "1.6rem" }}>
           {DESTS.slice(0, 4).map((d, i) => (

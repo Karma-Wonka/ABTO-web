@@ -90,8 +90,8 @@ const NAV_BASE: NavItem[] = [
         heading: "Travel Information",
         links: [
           { href: "/travel", label: "Getting to Bhutan" },
-          { href: "/travel#drukair", label: "Druk Air" },
-          { href: "/travel#tashiair", label: "Bhutan Airlines (Tashi Air)" },
+          { href: "https://drukair.com.bt", label: "Druk Air" },
+          { href: "https://www.bhutanairlines.bt", label: "Bhutan Airlines (Tashi Air)" },
           { href: "/travel#places", label: "Places of Interest" },
           { href: "/travel#experiences", label: "Explore Bhutan" },
           { href: "/horses", label: "Horse Contractors" }
@@ -241,7 +241,12 @@ export default function Header({ liveData }: { liveData: LiveData }) {
                     <div key={group.heading}>
                       <h6>{group.heading}</h6>
                       {group.links.map((link) => (
-                        <Link key={link.href} href={link.href} onClick={() => setOpenMega(null)}>
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setOpenMega(null)}
+                          {...(link.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                        >
                           {link.label}
                           {"small" in link && link.small ? <small>{link.small}</small> : null}
                         </Link>
@@ -300,7 +305,13 @@ export default function Header({ liveData }: { liveData: LiveData }) {
             </button>
             <div className="dbody">
               {item.groups.flatMap((g) => g.links).map((link) => (
-                <Link key={link.href} href={link.href}>{link.label}</Link>
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  {...(link.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                >
+                  {link.label}
+                </Link>
               ))}
             </div>
           </div>
